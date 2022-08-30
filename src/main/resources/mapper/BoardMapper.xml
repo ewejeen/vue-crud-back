@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.board.mapper.BoardMapper">
+    <!-- 목록 조회 카운트 -->
+    <select id="selectBoardListCnt" resultType="int">
+        SELECT COUNT(*)
+        FROM  TB_HOME_BOARD
+        WHERE Section = #{section} AND DelFlag = 'N'
+        <if test="searchKeyword != null and searchKeyword != ''">
+            AND Title LIKE '%'+#{searchKeyword}+'%'
+        </if>
+        <if test="searchCondition != null and searchCondition != '' and searchCondition != 'all'">
+            AND DisplayYN = #{searchCondition}
+        </if>
+        <if test="registerName != null and registerName != ''">
+            AND RegisterName LIKE '%'+#{registerName}+'%'
+        </if>
+    </select>
+
+    <!-- 목록 조회 -->
+    <select id="selectBoardList" resultType="com.example.board.vo.BoardVO">
+        SELECT
+            AA.*
+        FROM (
+            SELECT
+                ROW_NUMBER() OVER (ORDER BY IDXNO DESC) RNUM
+                , Section, IDXNO, Title, Contents, RegisterId, RegisterName, RegisterDate
+                , Attach, Refer, DelFlag, HitCount, SDate, IP, DisplayYN
+                <if test="section == 1">
+                , (SELECT SUBSTRING(CONVERT(VARCHAR(30), CAST(SDate AS DATETIME), 121), 6,2) FROM TB_HOME_BOARD B WHERE B.IDXNO = A.IDXNO) SDateMonth
+                </if>
+            FROM TB_HOME_BOARD A
+            WHERE Section = #{section} AND DelFlag = 'N'
+            <if test="searchKeyword != null and searchKeyword != ''">
+            AND Title LIKE '%'+#{searchKeyword}+'%'
+            </if>
+            <if test="searchCondition != null and searchCondition != '' and searchCondition != 'all'">
+            AND DisplayYN = #{searchCondition}
+            </if>
+            <if test="registerName != null and registerName != ''">
+            AND RegisterName LIKE '%'+#{registerName}+'%'
+            </if>
+            <if test="sDateYear != null and sDateYear != ''">
+            AND SDate LIKE #{sDateYear}+'%'
+            </if>
+        )AA
+        <if test="section != 1">
+        WHERE AA.RNUM BETWEEN #{firstIndex} AND #{lastIndex}
+        ORDER BY IDXNO DESC
+        </if>
+    </select>
+
+    <!-- 상세 조회 -->
+    <select id="selectBoardDetail" resultType="com.example.board.vo.BoardVO">
+        SELECT
+            Section, IDXNO, Title, Contents, RegisterID, RegisterName, RegisterDate
+            , Attach, Refer, DelFlag, HitCount, SDate, IP, DisplayYN
+        FROM  TB_HOME_BOARD
+        WHERE IDXNO = #{idxno}
+    </select>
+
+    <!-- 게시물 번호 조회 -->
+    <select id="selectMaxIdxNo" resultType="int">
+        SELECT MAX(IDXNO)
+        FROM   TB_HOME_BOARD
+    </select>
+
+    <!-- 게시물 등록 -->
+    <insert id="writeBoard" parameterType="com.example.board.vo.BoardVO">
+        INSERT INTO TB_HOME_BOARD (
+            Section, IDXNO, CategoryId, Title, Contents, RegisterId, RegisterName, RegisterDate
+            , Attach, Refer, Step, Depth, DelFlag, SDate, HitCount, IP, DisplayYN
+        ) VALUES (
+            #{section}, #{idxno}, -1, #{title}, #{contents}, #{registerId}, #{registerName}
+            , GETDATE(), #{attach}, #{refer}, 0, 0, 'N', #{sDate}, 0, #{ip}, 'Y'
+        )
+    </insert>
+
+    <!-- 게시물 수정 -->
+    <update id="modifyBoard" parameterType="com.example.board.vo.BoardVO">
+        UPDATE TB_HOME_BOARD
+        SET Title = #{title}
+        , Contents = #{contents}
+        , Attach = #{attach}
+        , DisplayYN = #{displayYn}
+        <if test="sDate != null and sDate != ''">
+        , SDate = #{sDate}
+        </if>
+        WHERE IDXNO = #{idxno}
+    </update>
+
+    <!-- 게시물 삭제 -->
+    <update id="deleteBoard" parameterType="com.example.board.vo.BoardVO">
+        UPDATE TB_HOME_BOARD
+        SET DelFlag = 'Y', DisplayYN = 'N'
+        WHERE IDXNO = #{idxno}
+    </update>
+</mapper>

@@ -1,0 +1,37 @@
+plugins {
+	id 'org.springframework.boot' version '2.7.3'
+	id 'io.spring.dependency-management' version '1.0.13.RELEASE'
+	id 'java'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web:2.7.3'
+	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.2.2'
+	compileOnly 'org.projectlombok:lombok:1.18.24'
+	implementation 'org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4:1.16'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools:2.7.3'
+	annotationProcessor 'org.projectlombok:lombok:1.18.24'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test:2.7.3'
+	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.3'
+	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.13.3'
+	implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
+	implementation group: 'com.microsoft.sqlserver', name: 'mssql-jdbc', version: '11.2.0.jre8'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
