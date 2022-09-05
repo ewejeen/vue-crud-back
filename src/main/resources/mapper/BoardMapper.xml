@@ -46,7 +46,7 @@
             </if>
         )AA
         <if test="section != 1">
-        WHERE AA.RNUM BETWEEN #{firstIndex} AND #{lastIndex}
+        WHERE AA.RNUM BETWEEN #{startRowNum}+1 AND #{endRowNum}
         ORDER BY IDXNO DESC
         </if>
     </select>

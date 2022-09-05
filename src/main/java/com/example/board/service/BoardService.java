@@ -30,8 +30,8 @@ public class BoardService  {
     public BoardVO selectBoardDetail(BoardVO vo) {
         BoardVO board = boardMapper.selectBoardDetail(vo);
 
-        if(vo.getPageIndex() != 0) {
-            board.setPageIndex(vo.getPageIndex());
+        if(vo.getPageNo() != 0) {
+            board.setPageNo(vo.getPageNo());
         }
         if(vo.getSearchKeyword() != null) {
             board.setSearchKeyword(vo.getSearchKeyword());

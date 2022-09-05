@@ -2,7 +2,7 @@
 
 Vue JS + Spring Boot로 게시판 CRUD 만들기 연습
 
--- Spring Boot + VueJS 3 + MyBatis + MS SQL
+-- Spring Boot(java 1.8, gradle) + VueJS 3 + MyBatis + MS-SQL
 
 
 - 목록

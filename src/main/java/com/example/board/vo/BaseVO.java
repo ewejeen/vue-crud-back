@@ -24,21 +24,17 @@ public class BaseVO {
     private String searchValue3;
 
     /** 현재페이지 */
-    private int pageIndex = 1;
+    private int pageNo = 1;
 
     /** 페이지갯수 */
-    private int pageUnit = 10;
+    private int blockSize = 10;
 
     /** 페이지사이즈 */
     private int pageSize = 10;
 
     /** firstIndex */
-    private int firstIndex = 1;
+    private int startRowNum = 1;
 
     /** lastIndex */
-    private int lastIndex = 1;
-
-    /** recordCountPerPage */
-    private int recordCountPerPage = 10;
-
+    private int endRowNum = 1;
 }

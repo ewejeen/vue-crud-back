@@ -2,6 +2,7 @@ package com.example.board.controller;
 
 import com.example.board.service.BoardService;
 import com.example.board.vo.BoardVO;
+import com.example.common.config.PagingUtil;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.util.JSONPObject;
 import org.json.simple.JSONObject;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import com.example.common.config.PaginationInfo;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,29 +30,27 @@ public class BoardController {
      * 게시글 목록 조회
      */
     @GetMapping(value="/board/getList")
-    public @ResponseBody JSONObject selectBoardList(BoardVO boardVO) {
+    public @ResponseBody JSONObject selectBoardList(BoardVO boardVO, PagingUtil pagingUtil) {
         boardVO.setSection(7);
-        boardVO.setPageUnit(10);
-        boardVO.setPageSize(10);
 
-        PaginationInfo paginationInfo = new PaginationInfo();
-
-        paginationInfo.setCurrentPageNo(boardVO.getPageIndex());
-        paginationInfo.setRecordCountPerPage(boardVO.getPageUnit());
-        paginationInfo.setPageSize(boardVO.getPageSize());
-
-        boardVO.setFirstIndex(paginationInfo.getFirstRecordIndex()+1);
-        boardVO.setLastIndex(paginationInfo.getLastRecordIndex());
-        boardVO.setRecordCountPerPage(paginationInfo.getRecordCountPerPage());
-
-        List<BoardVO> list = boardService.selectBoardList(boardVO);
+        List<BoardVO> returnList = new ArrayList<>();
         int totalCnt = boardService.selectBoardListCnt(boardVO);
 
-        paginationInfo.setTotalRecordCount(totalCnt);
+        pagingUtil.setTotalCount(totalCnt);
+        int pageNo = pagingUtil.getPageNo() == 0 ? 1 : pagingUtil.getPageNo();
+        int pageSize = pagingUtil.getPageSize() == 0 ? 10 : pagingUtil.getPageSize();
+        int endRow = pageNo * pageSize;
+        int startRow = endRow - pageSize;
+
+        boardVO.setPageNo(pageNo);
+        boardVO.setPageSize(pageSize);
+        boardVO.setEndRowNum(endRow);
+        boardVO.setStartRowNum(startRow);
+        List<BoardVO> list = boardService.selectBoardList(boardVO);
 
         JSONObject json = new JSONObject();
         json.put("list",list);
-        json.put("paging",paginationInfo);
+        json.put("paging",pagingUtil);
         json.put("boardVO",boardVO);
         return json;
     }
@@ -58,8 +58,8 @@ public class BoardController {
     /**
      * 게시글 상세 조회
      */
-    @RequestMapping("/board/view")
-    public BoardVO boardDetail(BoardVO vo) {
+    @RequestMapping("/board/getDetail")
+    public @ResponseBody BoardVO boardDetail(BoardVO vo) {
         return boardService.selectBoardDetail(vo);
     }
 
